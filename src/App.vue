@@ -2,6 +2,7 @@
   <Upload/>
   <!-- <Table/> -->
   <!-- <Person/> -->
+  <router-view></router-view>
 </template>
 <script lang="ts">
 import Upload from "./components/Upload.vue";

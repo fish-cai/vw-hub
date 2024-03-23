@@ -16,7 +16,10 @@ declare module 'vue' {
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     Pagination: typeof import('./src/components/Pagination.vue')['default']
     Person: typeof import('./src/components/Person.vue')['default']
+    RouterLink: typeof import('vue-router')['RouterLink']
+    RouterView: typeof import('vue-router')['RouterView']
     Table: typeof import('./src/components/Table.vue')['default']
     Upload: typeof import('./src/components/Upload.vue')['default']
+    VwHubMap: typeof import('./src/components/VwHubMap.vue')['default']
   }
 }
