@@ -10,10 +10,12 @@ declare module 'vue' {
     Demo: typeof import('./src/components/Demo.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElOption: typeof import('element-plus/es')['ElOption']
+    ElPagination: typeof import('element-plus/es')['ElPagination']
     ElSelect: typeof import('element-plus/es')['ElSelect']
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     Pagination: typeof import('./src/components/Pagination.vue')['default']
+    Person: typeof import('./src/components/Person.vue')['default']
     Table: typeof import('./src/components/Table.vue')['default']
     Upload: typeof import('./src/components/Upload.vue')['default']
   }
