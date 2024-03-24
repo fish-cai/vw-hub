@@ -3,12 +3,10 @@
     <div ref="container"></div>
   </div>
 </template>
-<script setup name="ADemo">
-import axios from "axios";
+<script setup>
 import * as echarts from "echarts";
 import "echarts-extension-amap";
 import { ref, shallowRef, onMounted } from "vue";
-import { useRoute } from "vue-router";
 const AMap = window.AMap;
 let container = ref();
 let map = shallowRef("null");
@@ -16,65 +14,29 @@ let myChart = shallowRef("null");
 const flyLineData = ref([]);
 const pointData = ref([]);
 
-const queryParams = ref("");
-
-// 使用 useRoute 获取当前路由对象
-const route = useRoute();
 onMounted(() => {
-  //先加载要查看的数据
-  const resultId = route.query["resultId"];
-  loadViewData();
-  async function loadViewData() {
-    const params = {
-      resultId: resultId,
-    };
-    await axios
-      .get("http://localhost:8080/vwHubInput/view", { params })
-      .then((data) => {
-        const resData = data.data.data;
-        console.log(resData);
-        flyLineData.value = resData.lineRes;
-        pointData.value = resData.pointRes;
+  Object.defineProperty(container.value, "clientWidth", {
+    get: function () {
+      return 1000;
+    },
+  });
+  Object.defineProperty(container.value, "clientHeight", {
+    get: function () {
+      return 800;
+    },
+  });
 
-        //数据请求完 再加载地图
-        Object.defineProperty(container.value, "clientWidth", {
-          get: function () {
-            return 2000;
-          },
-        });
-        Object.defineProperty(container.value, "clientHeight", {
-          get: function () {
-            return 2500;
-          },
-        });
-        newCharts();
-      })
-      .catch((error) => {
-        alert(error)
-      });
-  }
-  // Object.defineProperty(container.value, "clientWidth", {
-  //   get: function () {
-  //     return 1000;
-  //   },
-  // });
-  // Object.defineProperty(container.value, "clientHeight", {
-  //   get: function () {
-  //     return 800;
-  //   },
-  // });
+  newCharts();
 });
 const newCharts = () => {
   myChart.value = echarts.init(container.value);
-  console.log(pointData.value);
-  console.log(flyLineData.value);
   const option = {
     // 高德地图的配置
     amap: {
       maxPitch: 60,
       pitch: 0, //45 俯仰角
       viewMode: "3D",
-      zoom: 5,
+      zoom: 14,
       zooms: [4, 22],
       mapStyle: "amap://styles/darkblue", //地图主题
       center: [120.38, 36.08],
@@ -101,7 +63,22 @@ const newCharts = () => {
             color: "red",
           },
         },
-        data: flyLineData.value,
+        data: [
+          {
+            odCount: "3",
+            coords: [
+              [120.311771, 36.064771],
+              [120.432771, 36.106771],
+            ],
+          },
+          {
+            odCount: "4",
+            coords: [
+              [120.311771, 36.064771],
+              [120.417716, 36.198771],
+            ],
+          },
+        ],
       },
       {
         type: "effectScatter",
@@ -121,7 +98,20 @@ const newCharts = () => {
             color: "yellow",
           },
         },
-        data: pointData.value,
+        data: [
+          {
+            name: "青岛站",
+            value: [120.311771, 36.064771],
+          },
+          {
+            name: "远洋风景",
+            value: [120.432771, 36.106771],
+          },
+          {
+            name: "十梅庵公园",
+            value: [120.417716, 36.198771],
+          },
+        ],
       },
     ],
   };
@@ -149,6 +139,3 @@ const tools = () => {
   map.value.addControl(toolBar);
 };
 </script>
-<style scoped>
-
-</style>

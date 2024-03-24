@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    ADemo: typeof import('./src/components/ADemo.vue')['default']
     AmapDemo: typeof import('./src/components/AmapDemo.vue')['default']
     copy: typeof import('./src/components/VwHubMap copy.vue')['default']
     Demo: typeof import('./src/components/Demo.vue')['default']

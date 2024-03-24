@@ -158,7 +158,7 @@ const handleView = (scope)=>{
   // router.push({name:'VwHubMap',params:params});
   // router.push('VwHubMap');
   //都不生效
-  window.open('/#/VwHubMap');
+  window.open('/#/VwHubMap?resultId='+scope.row.resultId);
 }
 
 

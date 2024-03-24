@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import VwHubMap from '../components/VwHubMap.vue';
-import VwHubMapDemo from '../components/VwHubMapDemo.vue';
-import AmapDemo from '../components/AmapDemo.vue';
+// import AmapDemo from '../components/AmapDemo.vue';
+import ADemo from '../components/ADemo.vue';
 import Upload from '../components/Upload.vue';
 
 const routes = [
@@ -19,12 +19,12 @@ const routes = [
     {
         path: '/VwHubMap',
         name: 'VwHubMap',
-        component: VwHubMapDemo
+        component: VwHubMap
     },
     {
-        path: '/AmapDemo',
-        name: 'AmapDemo',
-        component: AmapDemo
+        path: '/ADemo',
+        name: 'ADemo',
+        component: ADemo
     }
 ];
 
