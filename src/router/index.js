@@ -1,15 +1,17 @@
 import {createRouter, createWebHashHistory} from 'vue-router'
+import VwHubMap from '../components/VwHubMap.vue'
+import Upload from '../components/Upload.vue'
 
 const routes = [
     {
         path:'/',
-        name:"App",
-        component:()=>import(/* webpackChunkName:'App'*/'@/App.vue')
+        name:"upload",
+        component: Upload
     },
     {
-        path:'/viewMap',
+        path:'/VwHubMap',
         name:'VwHubMap',
-        component:()=>import(/* webpackChunkName:'VwHubMap'*/'@/components/VwHubMap.vue')
+        component:VwHubMap
     }
 ]
 
@@ -18,4 +20,4 @@ const router = createRouter({
     routes
 })
 
-export default {router}
+export default router

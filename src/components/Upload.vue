@@ -48,13 +48,12 @@
   </div>
 </template>
 
-<script setup lang="ts" name="Upload">
+<script setup lang="ts" name="Upload" props>
 import { ref, reactive, onMounted } from "vue";
 import { ElTable, ElTableColumn, ElSelect, ElOption } from "element-plus";
 import axios from "axios";
-import { useRouter } from 'vue-router';
-import {VwHubMap} from './VwHubMap.vue'
 import { ElMessage } from 'element-plus'
+import { pa } from "element-plus/es/locale";
 
 interface FormData {
   fileType: 1 | 2; // 1: 输入, 2: 输出
@@ -149,14 +148,18 @@ const onResultIdChange=(scope)=>{
   
 }
 
-const router = useRouter()
+const props = defineProps(['router']);
 const handleView = (scope)=>{
   const params={
     id:scope.row.id,
     resultId:scope.row.resultId
   }
   
-  router.push({ name: 'VwHubMap', params: { id: 123 }});
+  const router = props.router
+  console.log(router)
+  // router.push({name:'VwHubMap',params:params});
+  // router.push('/viewMap');
+  window.open('/VwHubMap', '_blank');
 }
 
 
