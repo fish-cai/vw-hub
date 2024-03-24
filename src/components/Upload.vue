@@ -50,10 +50,8 @@
 
 <script setup lang="ts" name="Upload" props>
 import { ref, reactive, onMounted } from "vue";
-import { ElTable, ElTableColumn, ElSelect, ElOption } from "element-plus";
 import axios from "axios";
 import { ElMessage } from 'element-plus'
-import { pa } from "element-plus/es/locale";
 
 interface FormData {
   fileType: 1 | 2; // 1: 输入, 2: 输出
@@ -158,8 +156,9 @@ const handleView = (scope)=>{
   const router = props.router
   console.log(router)
   // router.push({name:'VwHubMap',params:params});
-  // router.push('/viewMap');
-  window.open('/VwHubMap', '_blank');
+  // router.push('VwHubMap');
+  //都不生效
+  window.open('/#/VwHubMap');
 }
 
 

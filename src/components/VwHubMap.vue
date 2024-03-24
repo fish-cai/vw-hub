@@ -1,14 +1,15 @@
 <template>
-  <div>
-    <h2>你好啊</h2>
+  <div class="dd">
+    <h2 class="dd">你好啊</h2>
   </div>
 </template>
-<script lang="ts" setup name="VwHubMap"></script>
+<script lang="ts" setup name="VwHubMap">
+console.log("VwHubMap.vue loaded");
+</script>
 <style>
-.div {
-  background-color: black;
+.dd {
+  background-color: #ddd;
   height: 20%;
   width: 100%;
-
 }
 </style>

@@ -1,20 +1,19 @@
 <template>
-  <div id="app"></div>
-  <Upload :router="router" />
-  <!-- <Table/> -->
-  <!-- <Person/> -->
+  <!-- <Upload :router="router"/> -->
+  <!-- <vw-hub-map/> -->
+  <router-view></router-view>
 </template>
 <script lang="ts">
 import Upload from "./components/Upload.vue";
-import Table from './components/Table.vue'
-import Person from './components/Person.vue'
-import router from '@/router'
+// import router from '@/router'
+import { useRouter } from 'vue-router';
 
 export default {
   name: "App",
-  components: {Upload,Table,Person},
+  components: {Upload},
   setup(){
-    console.log(router)
+    const router = useRouter()
+    console.log("app.vue router",router)
     return {router}
   }
 };

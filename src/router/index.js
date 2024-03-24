@@ -1,23 +1,29 @@
-import {createRouter, createWebHashHistory} from 'vue-router'
-import VwHubMap from '../components/VwHubMap.vue'
-import Upload from '../components/Upload.vue'
+import { createRouter, createWebHashHistory } from 'vue-router';
+import VwHubMap from '../components/VwHubMap.vue';
+import Upload from '../components/Upload.vue';
 
 const routes = [
+    
     {
-        path:'/',
-        name:"upload",
+        path: '',  
+        component: Upload,
+            redirect: '/upload'
+    },
+    {
+        path: '/upload',
+        name: "Upload",
         component: Upload
     },
     {
-        path:'/VwHubMap',
-        name:'VwHubMap',
-        component:VwHubMap
+        path: '/VwHubMap',
+        name: 'VwHubMap',
+        component: VwHubMap
     }
-]
+];
 
 const router = createRouter({
-    history:createWebHashHistory(),
+    history: createWebHashHistory(),
     routes
-})
+});
 
-export default router
+export default router;
