@@ -1,0 +1,362 @@
+<script>
+        layui.use(['element', 'jquery', 'form', 'laydate'], function() {
+            var $ = layui.jquery;
+            var element = layui.element;
+            var laydate = layui.laydate;
+            var form = layui.form;
+            form.render(null, 'choose_time_form');
+            var map;
+            var marker;
+            var markers1 = [];
+            var markers2 = [];
+            var navg = [];
+            var infoWindow;
+            var resizesuccess = false;
+
+
+            GetMap(); //加载高德
+
+            var myChart;
+            var series;
+
+            function GetMap() {
+                var polygon; //矢量图
+                map = new AMap.Map('container', {
+                    //       mapStyle: '//amap://styles/gray', //设置地图的显示样式
+                    center: [106.92, 42.48], //中心
+                    features: ['bg', 'road', 'point', 'building'],
+                    resizeEnable: true, //是否监控地图容器尺寸变化
+                    zoom: 4,
+                    zooms: [4, 18]
+                });
+                var layer = new AMap.TileLayer({
+                    map: map,
+                    zooms: [4, 18], //可见级别
+                    visible: true, //是否可见
+                    opacity: 1, //透明度
+                    zIndex: 0 //叠加层级
+                });
+                showNational(); //    设置只显示中国地图的图层样式
+                // css已隐藏 未显示放大缩小
+                AMapUI.loadUI(['control/BasicControl'], function(BasicControl) {
+                    //缩放控件，显示Zoom值
+                    map.addControl(new BasicControl.Zoom({
+                        position: {
+                            top: '50px',
+                            left: '600px',
+                        },
+                        showZoomNum: true,
+                        theme: 'dark'
+                    }));
+                });
+                myChart = echarts.init(document.getElementById('container'));
+                myChart.setOption({
+                    title: {
+                        text: '',
+                        subtext: '飞线',
+                        left: 'center',
+                        textStyle: {
+                            color: '#fff'
+                        }
+                    },
+                    amap: {
+                        maxPitch: 60,
+                        pitch: 0, //45 俯仰角
+                        viewMode: '2D',
+                        zoom: 4,
+                        zooms: [4, 18],
+                        mapStyle: 'amap://styles/ee65e6db53c8b8099253e3bb6abce0ad', //地图主题
+                        center: [106.92, 42.48], //中心点
+                        // rotation: 0, //顺时针旋转角度
+                        features: ['bg', 'road', 'point', 'building'],
+                        resizeEnable: true,
+                    },
+                    animation: false,
+                    series: []
+                });
+                //上面的部分是echarts的配置，需要注意的是amap，这里的配置就是针对 高德地图 的配置了，而支持哪些配置
+                //可以去高德地图的开发平台去查看
+                map = myChart.getModel().getComponent('amap').getAMap();
+                var layer = myChart.getModel().getComponent('amap').getLayer();
+
+                AMap.event.addListener(map, 'zoomend', function() {
+                    console.log('当前缩放级别：' + map.getZoom());
+                    console.log('俯视视角' + map.getPitch());
+                    console.log('俯视视角' + map.getPitch());
+                    var zoom = map.getZoom();
+                    if (zoom > 5) {
+                        map.setMapStyle('amap://styles/normal');
+                        polygon ? polygon.hide() : null;
+                    } else {
+                        map.setMapStyle('amap://styles/ee65e6db53c8b8099253e3bb6abce0ad');
+                        polygon ? polygon.show() : null;
+
+                    }
+                });
+                //添加仓库点
+                addMarkers1();
+                // 添加经销商点
+                addMarkers2();
+                // 添加飞线
+                addFlyLine();
+                //下面是确保高德地图渲染的时候，echarts同时也需要再次渲染一次，保持位置的同步
+                layer.render = function() {
+                    myChart.setOption({
+                        series: series
+                    });
+                    console.log('当前缩放级别：' + map.getZoom());
+                    console.log('俯视视角：' + map.getPitch());
+                    console.log('顺时针：' + map.getRotation());
+                }
+            }
+
+
+            function showNational() {
+                map.setMapStyle('amap://styles/ee65e6db53c8b8099253e3bb6abce0ad');
+                if (map.getZoom() < 5) {
+                    //修改边界线
+                    AMap.plugin('AMap.DistrictSearch', function() {
+
+                            var districtSearch = new AMap.DistrictSearch({
+                                    // 关键字对应的行政区级别，country表示国家
+                                    level: 'country',
+                                    extensions: 'all',
+                                    //  显示下级行政区级数，1表示返回下一级行政区
+                                    subdistrict: 0
+                                })
+                                // 搜索所有省/直辖市信息
+                            districtSearch.search('中国', function(status, result) {
+                                var path = result.districtList[0].boundaries;
+                                // 查询成功时，result即为对应的行政区信息
+                                polygon = new AMap.Polygon({
+                                    map: map,
+                                    strokeWeight: 2,
+                                    strokeColor: '#2a67df',
+                                    fillOpacity: 0,
+                                    path: path
+                                });
+                                // map.setFitView();//自适应地图尺寸
+                            })
+                        })
+                        // AMap.setPointToCenter(400, 400);//设置地图靠下移动
+                }
+
+            }
+            // 添加飞线
+            function addFlyLine() {
+                var SNList = GetStockListData.Data.SNStockList;
+                var FlyLineItem = [];
+                var ovPoint = [];
+                for (var i = 0; i < SNList.length; i++) {
+                    FlyLineItem.push({
+                        "fromName": "上海",
+                        "toName": "包头",
+                        "coords": [
+                            [SNList[i].NestleStock.longitude, SNList[i].NestleStock.latitude],
+                            [SNList[i].longitude, SNList[i].latitude]
+                        ],
+                        "value": [i]
+                    })
+                }
+                series = [{
+                        coordinateSystem: "amap", // 该系列使用的坐标系是高德地图的坐标系
+                        type: "lines", // 该类型用于地图上路线的绘制
+                        zlevel: 1, // 相当于z-index
+                        effect: { // 线特效的配置
+                            show: true, // 是否显示特效
+                            period: 5, // 特效动画的时间
+                            trailLength: 0.7, // 特效尾迹的长度 0-1
+                            color: "#a6c84c", // 特效的颜色
+                            symbolSize: 3 // 特效的大小
+                        },
+                        lineStyle: { // 线的颜色
+                            normal: {
+                                color: "rgba(166, 200, 76, 0.3)",
+                                width: 0.5,
+                                curveness: 0.2
+                            }
+                        },
+                        data: FlyLineItem,
+                    }],
+
+                    myChart.setOption({
+                        series: series
+                    });
+            }
+
+            // 仓库点
+            function addMarkers1() {
+                var NTList = GetStockListData.Data.NestleStockList;
+                for (var i = 0; i < NTList.length; i++) {
+                    marker = new AMap.Marker({
+                        map: map,
+                        position: new AMap.LngLat(NTList[i].longitude, NTList[i].latitude),
+                        title: NTList[i].StockName,
+                        icon: "../../qc/dist/style/img/qcc.png",
+                        offset: new AMap.Pixel(-8, -9)
+                    });
+                    marker.setMap(map);
+                    markers1.push(marker);
+                    marker.setExtData(JSON.stringify(NTList[i]));
+                    marker.on('click', infoOpen);
+                }
+            }
+            // 经销商点
+            function addMarkers2() {
+                var SNList = GetStockListData.Data.SNStockList;
+                for (var i = 0; i < SNList.length; i++) {
+                    marker = new AMap.Marker({
+                        map: map,
+                        position: new AMap.LngLat(SNList[i].longitude, SNList[i].latitude),
+                        title: SNList[i].StockName,
+                        icon: choosePic(),
+                        offset: new AMap.Pixel(-15, -15)
+                    });
+                    marker.setMap(map);
+                    markers2.push(marker);
+                    marker.setExtData(JSON.stringify(SNList[i]));
+                    marker.on('click', infoOpen);
+                }
+            }
+            // 随机出不同的点
+            function choosePic() {
+                var myPix = new Array("../../qc/dist/style/img/work1.png", "../../qc/dist/style/img/work2.png", "../../qc/dist/style/img/work3.png", "../../qc/dist/style/img/work4.png", "../../qc/dist/style/img/work5.png", "../../qc/dist/style/img/work5.png");
+                var randomNum = Math.floor((Math.random() * myPix.length));
+                return myPix[randomNum];
+            }
+
+            var depth = 2;
+            var disProvince;
+
+            function initPro(code, dep) {
+                dep = typeof dep == 'undefined' ? 2 : dep;
+                adCode = code;
+                depth = dep;
+
+                disProvince && disProvince.setMap(null);
+                disProvince = new AMap.DistrictLayer.Province({
+                    zIndex: 12,
+                    adcode: [code],
+                    depth: dep,
+                    styles: {
+                        'fill': function(properties) {
+                            var adcode = properties.adcode;
+                            return getColorByAdcode(adcode);
+                        },
+                        'province-stroke': 'cornflowerblue',
+                        'city-stroke': 'white', // 中国地级市边界
+                        'county-stroke': 'rgba(255,255,255,0.5)' // 中国区县边界
+                    }
+                });
+
+                disProvince.setMap(map);
+            }
+
+            // 颜色辅助方法
+            var colors = {};
+            var getColorByAdcode = function(adcode) {
+                if (!colors[adcode]) {
+                    var gb = Math.random() * 155 + 50;
+                    colors[adcode] = 'rgb(' + gb + ',' + gb + ',255)';
+                }
+
+                return colors[adcode];
+            };
+            form.on('switch(switchArea)', function(data) {
+                    var checked = data.elem.checked;
+                    if (checked) {
+                        showNational();
+                        $("#switchArea").html("全国")
+                        console.log("显示全国")
+                    } else {
+                        polygon.hide();
+                        map.setMapStyle('amap://styles/normal');
+                        $("#switchArea").html("全球")
+                        console.log("显示全球")
+
+                    }
+                })
+                // 监听飞线是否显示
+            form.on('switch(switchLine)', function(data) {
+                var checked = data.elem.checked;
+                if (checked) {
+                    addFlyLine()
+                } else {
+                    myChart.setOption({
+                        series: []
+                    });
+                }
+            });
+            // 监听仓库是否被选中
+            form.on('checkbox(warehouse)', function(data) {
+                var warehouseChecked = data.elem.checked
+                if (warehouseChecked) {
+                    addMarkers1();
+                } else {
+                    map.remove(markers1);
+                }
+            });
+            // 监听经销商是否被选中
+            form.on('checkbox(dealers)', function(data) {
+                var dealersChecked = data.elem.checked
+                if (dealersChecked) {
+                    addMarkers2();
+                } else {
+                    map.remove(markers2);
+                }
+            });
+            // 监听门店是否被选中
+            form.on('checkbox(stores)', function(data) {
+                var storesChecked = data.elem.checked
+                console.log(data.elem.checked); //是否被选中，true或者false
+            });
+
+            function infoClose(e) {
+                map.clearInfoWindow();
+            }
+
+            function infoOpen(e) {
+                var extdata = e.target.getExtData();
+                console.log('extdata展示详情', extdata)
+                var data = JSON.parse(extdata);
+                var showinfo = [];
+                showinfo.push("<div class='border_left_top'></div><div class='border_right_top'></div> <div class='border_right_bottom'></div><div class='border_left_bottom'></div>");
+                showinfo.push(data.AreaName ? "<h3 class='infomsg'>" + "仓库名称" + "<span>" + data.StockName + "</span></h3>" : "");
+                showinfo.push("<p class='infomsg'>" + " 物流创建量 " + "<span>" + data.ID + "</span></p>");
+                showinfo.push("<p class='infomsg'>" + "期末在仓货值 " + "<span>" + data.longitude.toFixed(0) + "</span></p>");
+                showinfo.push("<p class='infomsg';'>" + "总发货量" + "<span>" + data.latitude.toFixed(0) + "</span></p>");
+                showinfo.push("<p class='infomsg';'>" + "收货区县总量" + "<span>" + data.InventoryLevel + "</span></p>");
+                showinfo.push(data.Address ? "<p class='infomsg'>" + "仓库地址" + "<span>" + data.Address + "</span></p>" : "");
+                ShowInfoWindow(e, showinfo);
+                var areaCode = data.areaCode;
+                console.log("areaCode", areaCode)
+                for (var j = 0; j < areaCode.length; j++) {
+                    initPro(areaCode[j], depth);
+                }
+            }
+
+            function ShowInfoWindow(e, showinfo) {
+                var infoWindow = new AMap.InfoWindow({
+                    closeWhenClickMap: true,
+                    isCustom: true, //使用自定义窗体
+                    content: createInfoWindow(showinfo.join("")),
+                    anchor: 'middle-right',
+                    offset: new AMap.Pixel(0, -30)
+                });
+
+                infoWindow.open(e.target.getMap(), e.target.getPosition(), 'margin-bottom:50');
+            }
+            //构建自定义信息窗体
+            function createInfoWindow(content) {
+                var info = document.createElement("div");
+                info.className = "infowindow";
+                // 定义中部内容
+                var middle = document.createElement("div");
+                middle.className = "infocontent";
+                middle.innerHTML = content;
+                info.appendChild(middle);
+                return info;
+            }
+
+        })
+    </script>

@@ -11,9 +11,12 @@
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
+    "@amap/amap-jsapi-loader": "^1.0.1",
     "axios": "^1.6.8",
     "echarts": "^5.5.0",
+    "echarts-extension-amap": "^1.12.0",
     "element-plus": "^2.6.1",
+    "leaflet": "^1.9.4",
     "vue": "^3.4.21",
     "vue-router": "^4.0.13"
   },
