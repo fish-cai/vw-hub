@@ -1,26 +1,66 @@
 <template>
   <div>
-    <form @submit.prevent="submitForm">
-      <select v-model="formData.fileType">
-        <option value="1">输入</option>
-        <option value="2">输出</option>
-      </select>
-      <input type="file" ref="fileInputRef" @change="handleFileChange" />
-      <button type="submit">提交</button>
-    </form>
+    <el-form
+      :inline="true"
+      v-model="formData"
+      label-width="auto"
+      label-position="left"
+    >
+      <el-form-item label="文件类型">
+        <el-select v-model="formData.fileType" style="width:200px;">
+          <el-option label="输入" value="1" key="1" />
+          <el-option label="输出" value="2" key="2" />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <label>上传文件</label>
+      </el-form-item>
+      <el-form-item>
+        <el-input
+          placeholder="文件名"
+          v-model="formData.modelFileName"
+          disabled
+          style="width: 200px"
+        />
+        <el-upload
+          class="upload-demo"
+          action="none"
+          :show-file-list="false"
+          drag
+          :on-change="handleFileChange"
+          :auto-upload="false"
+          ref="fileInputRef"
+        >
+          <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+          <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
+        </el-upload>
+        <el-button type="primary" @click="submitForm">提交</el-button>
+      </el-form-item>
+    </el-form>
     <div class="table" style="margin-top: 20px">
       <h3>列表</h3>
-      <el-table :data="tableData" style="width: 100%" #default="scope">
-        <el-table-column prop="fileName" label="文件名" width="120" />
-        <el-table-column prop="typeName" label="文件类型" width="120" />
-        <el-table-column prop="createTime" label="上传时间" width="120" />
-        <el-table-column label="操作" width="400">
+      <el-table :data="tableData" style="width: 100%">
+        <el-table-column prop="fileName" label="文件名" />
+        <el-table-column prop="typeName" label="文件类型" />
+        <el-table-column prop="createTime" label="上传时间" />
+        <el-table-column label="操作">
           <template #default="scope">
-            <el-button v-if="scope.row.fileType == 1" link type="primary" size="small" @click="handleStart"
+            <el-button
+              v-if="scope.row.fileType == 1"
+              link
+              type="primary"
+              size="small"
+              @click="handleStart(scope)"
               >启动</el-button
             >
-            <div v-if="scope.row.results.length>0" style="display:inline">
-              <el-select v-model="scope.row.resultId" placeholder="方案" size="small" style="width: 70px" @change="onResultIdChange(scope)">
+            <div v-if="scope.row.results.length > 0" style="display: inline">
+              <el-select
+                v-model="scope.row.resultId"
+                placeholder="方案"
+                size="small"
+                style="width: 170px"
+                @change="onResultIdChange(scope)"
+              >
                 <el-option
                   v-for="item in scope.row.results"
                   :key="item.id"
@@ -28,9 +68,10 @@
                   :value="item.id"
                 />
               </el-select>
-              <el-button link type="primary" size="small" @click="handleView(scope)">查看</el-button>
+              <el-button link type="primary" size="small" @click="handleView(scope)"
+                >查看</el-button
+              >
             </div>
-            
           </template>
         </el-table-column>
       </el-table>
@@ -38,7 +79,7 @@
         background
         :page-size="changePage.size"
         :current-page="changePage.current"
-        :page-sizes="[5,10, 25, 50]"
+        :page-sizes="[5, 10, 25, 50]"
         layout="sizes,prev, pager, next,total"
         :total="changePage.total"
         @size-change="handleSizeChange"
@@ -51,16 +92,25 @@
 <script setup lang="ts" name="Upload" props>
 import { ref, reactive, onMounted } from "vue";
 import axios from "axios";
-import { ElMessage } from 'element-plus'
+import { ElMessage } from "element-plus";
+import "element-plus/theme-chalk/el-loading.css";
+import "element-plus/theme-chalk/el-message.css";
+import "element-plus/theme-chalk/el-notification.css";
+import "element-plus/theme-chalk/el-message-box.css";
+import "element-plus/theme-chalk/el-drawer.css";
+import { UploadFilled } from "@element-plus/icons-vue";
+import { load } from "@amap/amap-jsapi-loader";
 
 interface FormData {
-  fileType: 1 | 2; // 1: 输入, 2: 输出
+  fileType: "1" | "2"; // 1: 输入, 2: 输出
   file: File | null;
+  modelFileName: String;
 }
 
 const formData = ref<FormData>({
-  fileType: 1,
+  fileType: "1",
   file: null,
+  modelFileName: "",
 });
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
@@ -70,10 +120,11 @@ const submitForm = () => {
   formDataToSend.append("fileType", formData.value.fileType + "");
   if (formData.value.file) {
     formDataToSend.append("file", formData.value.file);
-  }else{
-    ElMessage("请上传文件")
-    return
+  } else {
+    ElMessage("请上传文件");
+    return;
   }
+  console.log("data", formData.value);
   // 提交上传的数据
   axios
     .post("http://localhost:8080/vwHubInput/upload", formDataToSend, {
@@ -82,26 +133,25 @@ const submitForm = () => {
       },
     })
     .then((response) => {
-      alert("新增成功");
+      ElMessage("提交成功");
       loadTable();
     })
     .catch((error) => {
-      console.log(error);
+      ElMessage("提交失败");
       // 处理错误响应
     });
 };
 
-const handleFileChange = () => {
-  const files = fileInputRef.value?.files;
-  if (files && files.length) {
-    formData.value.file = files[0];
-  }
+const handleFileChange = (file) => {
+  console.log(file);
+  formData.value.file = file.raw;
+  formData.value.modelFileName = file.name;
 };
 
 const changePage = reactive({
   current: 1, //默认当前页面为1
   total: 1, //总共有多少数据
-  size: 10
+  size: 10,
 });
 
 //todo 这里用reactive 会导致table 数据跟分页错一页 为什么？
@@ -123,7 +173,7 @@ const loadTable = () => {
       // 处理成功响应
     })
     .catch((error) => {
-      alert("列表查询失败");
+      ElMessage("列表查询失败");
       // 处理错误响应
     });
 };
@@ -138,29 +188,45 @@ const handleSizeChange = (newSize) => {
   loadTable();
 };
 
-const handleStart = ()=>{
+const handleStart = (scope) => {
+  const params = {
+    id: scope.row.id,
+  };
 
-}
+  axios
+    .get("http://localhost:8080/vwHubInput/start", { params })
+    .then((data) => {
+      console.log(data);
+      // 处理成功响应
+      const res = data.data;
+      if (res.code == 500) {
+        ElMessage(res.message);
+      } else {
+        ElMessage("执行成功");
+        loadTable();
+      }
+    })
+    .catch((error) => {
+      ElMessage("接口调用失败");
+    });
+};
 
-const onResultIdChange=(scope)=>{
-  
-}
+const onResultIdChange = (scope) => {};
 
-const props = defineProps(['router']);
-const handleView = (scope)=>{
-  const params={
-    id:scope.row.id,
-    resultId:scope.row.resultId
-  }
-  
-  const router = props.router
-  console.log(router)
+const props = defineProps(["router"]);
+const handleView = (scope) => {
+  const params = {
+    id: scope.row.id,
+    resultId: scope.row.resultId,
+  };
+
+  const router = props.router;
+  console.log(router);
   // router.push({name:'VwHubMap',params:params});
   // router.push('VwHubMap');
   //都不生效
-  window.open('/#/VwHubMap?resultId='+scope.row.resultId);
-}
-
+  window.open("/#/VwHubMap?resultId=" + scope.row.resultId);
+};
 
 onMounted(loadTable);
 </script>
@@ -174,5 +240,8 @@ onMounted(loadTable);
 button {
   margin: 0 10px;
   font-size: 10px;
+}
+.el-form-item {
+  text-align: center;
 }
 </style>
