@@ -9,6 +9,7 @@ import * as echarts from "echarts";
 import "echarts-extension-amap";
 import { ref, shallowRef, onMounted } from "vue";
 import { useRoute } from "vue-router";
+import { ElMessage } from "element-plus";
 const AMap = window.AMap;
 let container = ref();
 let map = shallowRef("null");
@@ -23,6 +24,9 @@ const route = useRoute();
 onMounted(() => {
   //先加载要查看的数据
   const resultId = route.query["resultId"];
+  if(resultId == undefined){
+    ElMessage("请先选择方案")
+  }
   loadViewData();
   async function loadViewData() {
     const params = {
@@ -50,7 +54,7 @@ onMounted(() => {
         newCharts();
       })
       .catch((error) => {
-        alert(error)
+        ElMessage(error)
       });
   }
   // Object.defineProperty(container.value, "clientWidth", {

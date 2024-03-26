@@ -9,8 +9,6 @@ declare module 'vue' {
   export interface GlobalComponents {
     ADemo: typeof import('./src/components/ADemo.vue')['default']
     AmapDemo: typeof import('./src/components/AmapDemo.vue')['default']
-    copy: typeof import('./src/components/VwHubMap copy.vue')['default']
-    Demo: typeof import('./src/components/Demo.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
@@ -22,14 +20,11 @@ declare module 'vue' {
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElUpload: typeof import('element-plus/es')['ElUpload']
-    LearletMap: typeof import('./src/components/LearletMap.vue')['default']
     Pagination: typeof import('./src/components/Pagination.vue')['default']
     Person: typeof import('./src/components/Person.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    Table: typeof import('./src/components/Table.vue')['default']
     Upload: typeof import('./src/components/Upload.vue')['default']
     VwHubMap: typeof import('./src/components/VwHubMap.vue')['default']
-    VwHubMapDemo: typeof import('./src/components/VwHubMapDemo.vue')['default']
   }
 }
