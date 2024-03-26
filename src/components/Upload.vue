@@ -1,13 +1,8 @@
 <template>
   <div>
-    <el-form
-      :inline="true"
-      v-model="formData"
-      label-width="auto"
-      label-position="left"
-    >
+    <el-form :inline="true" v-model="formData" label-width="auto" label-position="left">
       <el-form-item label="文件类型">
-        <el-select v-model="formData.fileType" style="width:200px;">
+        <el-select v-model="formData.fileType" style="width: 200px">
           <el-option label="输入" value="1" key="1" />
           <el-option label="输出" value="2" key="2" />
         </el-select>
@@ -24,7 +19,7 @@
         />
         <el-upload
           class="upload-demo"
-          style="width: 50%;"
+          style="width: 50%"
           action="none"
           :show-file-list="false"
           drag
@@ -100,8 +95,9 @@ import "element-plus/theme-chalk/el-notification.css";
 import "element-plus/theme-chalk/el-message-box.css";
 import "element-plus/theme-chalk/el-drawer.css";
 import { UploadFilled } from "@element-plus/icons-vue";
-import { load } from "@amap/amap-jsapi-loader";
+import { inject } from "vue";
 
+const baseUrl = inject("baseUrl");
 interface FormData {
   fileType: "1" | "2"; // 1: 输入, 2: 输出
   file: File | null;
@@ -128,7 +124,7 @@ const submitForm = () => {
   console.log("data", formData.value);
   // 提交上传的数据
   axios
-    .post("http://localhost:8080/vwHubInput/upload", formDataToSend, {
+    .post(baseUrl + "vwHubInput/upload", formDataToSend, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -143,7 +139,7 @@ const submitForm = () => {
     });
 };
 
-const handleFileChange = (file:any) => {
+const handleFileChange = (file: any) => {
   console.log(file);
   formData.value.file = file.raw;
   formData.value.modelFileName = file.name;
@@ -164,7 +160,7 @@ const loadTable = () => {
     size: changePage.size,
   };
   axios
-    .get("http://localhost:8080/vwHubInput/page", { params })
+    .get(baseUrl + "vwHubInput/page", { params })
     .then((data) => {
       const resData = data.data.data;
       tableData.value = resData.records;
@@ -179,23 +175,23 @@ const loadTable = () => {
     });
 };
 
-const handleCurrentChange = (newPage:any) => {
+const handleCurrentChange = (newPage: any) => {
   changePage.current = newPage;
   loadTable();
 };
 
-const handleSizeChange = (newSize:any) => {
+const handleSizeChange = (newSize: any) => {
   changePage.size = newSize;
   loadTable();
 };
 
-const handleStart = (scope:any) => {
+const handleStart = (scope: any) => {
   const params = {
     id: scope.row.id,
   };
 
   axios
-    .get("http://localhost:8080/vwHubInput/start", { params })
+    .get(baseUrl + "vwHubInput/start", { params })
     .then((data) => {
       console.log(data);
       // 处理成功响应
@@ -212,14 +208,14 @@ const handleStart = (scope:any) => {
     });
 };
 
-const onResultIdChange = (scope:any) => {};
+const onResultIdChange = (scope: any) => {};
 
 const props = defineProps(["router"]);
-const handleView = (scope:any) => {
-  const resultId = scope.row.resultId
-  if(resultId == undefined){
-    ElMessage("请先选择方案")
-    return
+const handleView = (scope: any) => {
+  const resultId = scope.row.resultId;
+  if (resultId == undefined) {
+    ElMessage("请先选择方案");
+    return;
   }
   const params = {
     id: scope.row.id,

@@ -10,6 +10,9 @@ import "echarts-extension-amap";
 import { ref, shallowRef, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
+import {inject} from 'vue'
+
+const baseUrl = inject("baseUrl");
 const AMap = window.AMap;
 let container = ref();
 let map = shallowRef("null");
@@ -24,8 +27,8 @@ const route = useRoute();
 onMounted(() => {
   //先加载要查看的数据
   const resultId = route.query["resultId"];
-  if(resultId == undefined){
-    ElMessage("请先选择方案")
+  if (resultId == undefined) {
+    ElMessage("请先选择方案");
   }
   loadViewData();
   async function loadViewData() {
@@ -33,7 +36,7 @@ onMounted(() => {
       resultId: resultId,
     };
     await axios
-      .get("http://localhost:8080/vwHubInput/view", { params })
+      .get(baseUrl + "vwHubInput/view", { params })
       .then((data) => {
         const resData = data.data.data;
         console.log(resData);
@@ -54,7 +57,7 @@ onMounted(() => {
         newCharts();
       })
       .catch((error) => {
-        ElMessage(error)
+        ElMessage(error);
       });
   }
   // Object.defineProperty(container.value, "clientWidth", {
@@ -153,6 +156,4 @@ const tools = () => {
   map.value.addControl(toolBar);
 };
 </script>
-<style scoped>
-
-</style>
+<style scoped></style>
