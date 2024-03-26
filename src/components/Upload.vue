@@ -24,6 +24,7 @@
         />
         <el-upload
           class="upload-demo"
+          style="width: 50%;"
           action="none"
           :show-file-list="false"
           drag
@@ -32,7 +33,7 @@
           ref="fileInputRef"
         >
           <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-          <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
+          <div class="el-upload__text">点击上传文件</div>
         </el-upload>
         <el-button type="primary" @click="submitForm">提交</el-button>
       </el-form-item>
@@ -142,7 +143,7 @@ const submitForm = () => {
     });
 };
 
-const handleFileChange = (file) => {
+const handleFileChange = (file:any) => {
   console.log(file);
   formData.value.file = file.raw;
   formData.value.modelFileName = file.name;
@@ -178,17 +179,17 @@ const loadTable = () => {
     });
 };
 
-const handleCurrentChange = (newPage) => {
+const handleCurrentChange = (newPage:any) => {
   changePage.current = newPage;
   loadTable();
 };
 
-const handleSizeChange = (newSize) => {
+const handleSizeChange = (newSize:any) => {
   changePage.size = newSize;
   loadTable();
 };
 
-const handleStart = (scope) => {
+const handleStart = (scope:any) => {
   const params = {
     id: scope.row.id,
   };
@@ -211,21 +212,24 @@ const handleStart = (scope) => {
     });
 };
 
-const onResultIdChange = (scope) => {};
+const onResultIdChange = (scope:any) => {};
 
 const props = defineProps(["router"]);
-const handleView = (scope) => {
+const handleView = (scope:any) => {
+  const resultId = scope.row.resultId
+  if(resultId == undefined){
+    ElMessage("请先选择方案")
+    return
+  }
   const params = {
     id: scope.row.id,
-    resultId: scope.row.resultId,
+    resultId: resultId,
   };
 
-  const router = props.router;
-  console.log(router);
   // router.push({name:'VwHubMap',params:params});
   // router.push('VwHubMap');
   //都不生效
-  window.open("/#/VwHubMap?resultId=" + scope.row.resultId);
+  window.open("/#/VwHubMap?resultId=" + resultId);
 };
 
 onMounted(loadTable);
