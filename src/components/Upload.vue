@@ -43,6 +43,7 @@
           <template #default="scope">
             <el-button
               :loading="scope.row.startLoading"
+              :disabled="scope.row.results.length > 0 ? true : false"
               v-if="scope.row.fileType == 1"
               link
               type="primary"
@@ -65,6 +66,9 @@
                   :value="item.id"
                 />
               </el-select>
+              <el-button link type="primary" size="small" @click="handleDownload(scope)"
+                >下载</el-button
+              >
               <el-button link type="primary" size="small" @click="handleView(scope)"
                 >查看</el-button
               >
@@ -167,11 +171,14 @@ const loadTable = () => {
     .then((data) => {
       const resData = data.data.data;
       tableData.value = resData.records;
-      tableData.value.map(item => {
-        console.log(item)
-         item.startLoading = false
-         return item
-       })
+      tableData.value.map((item) => {
+        item.startLoading = false;
+        if (item.results.length > 0) {
+          item.resultId = item.results[0].id;
+        }
+        console.log(item);
+        return item;
+      });
       changePage.current = resData.current;
       changePage.size = resData.size;
       changePage.total = resData.total;
@@ -197,7 +204,7 @@ const handleStart = (scope: any) => {
   const params = {
     id: scope.row.id,
   };
-  scope.row.startLoading = true
+  scope.row.startLoading = true;
   axios
     .get(baseUrl + "vwHubInput/start", { params })
     .then((data) => {
@@ -209,11 +216,11 @@ const handleStart = (scope: any) => {
         ElMessage("执行成功");
         loadTable();
       }
-      scope.row.startLoading = false
+      scope.row.startLoading = false;
     })
     .catch((error) => {
       ElMessage("接口调用失败");
-      scope.row.startLoading = false
+      scope.row.startLoading = false;
     });
 };
 
@@ -226,15 +233,24 @@ const handleView = (scope: any) => {
     ElMessage("请先选择方案");
     return;
   }
-  const params = {
-    id: scope.row.id,
-    resultId: resultId,
-  };
 
   // router.push({name:'VwHubMap',params:params});
   // router.push('VwHubMap');
   //都不生效
   window.open("/#/VwHubMap?resultId=" + resultId);
+};
+
+const handleDownload = (scope: any) => {
+  const resultId = scope.row.resultId;
+  if (resultId == undefined) {
+    ElMessage("请先选择方案");
+    return;
+  }
+
+  const url = baseUrl + "/vwHubInput/downLoadOut?resultId=" + resultId;
+
+  // 使用浏览器原生的下载功能
+  window.open(url, "_blank");
 };
 
 onMounted(loadTable);
