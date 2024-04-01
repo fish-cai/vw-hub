@@ -94,7 +94,6 @@
 import { ref, reactive, onMounted } from "vue";
 import axios from "axios";
 import { ElMessage } from "element-plus";
-import { Eleme } from "@element-plus/icons-vue";
 import "element-plus/theme-chalk/el-loading.css";
 import "element-plus/theme-chalk/el-message.css";
 import "element-plus/theme-chalk/el-notification.css";
@@ -102,7 +101,6 @@ import "element-plus/theme-chalk/el-message-box.css";
 import "element-plus/theme-chalk/el-drawer.css";
 import { UploadFilled } from "@element-plus/icons-vue";
 import { inject } from "vue";
-import { fa, tr } from "element-plus/es/locale";
 
 const baseUrl = inject("baseUrl");
 interface FormData {
@@ -176,7 +174,6 @@ const loadTable = () => {
         if (item.results.length > 0) {
           item.resultId = item.results[0].id;
         }
-        console.log(item);
         return item;
       });
       changePage.current = resData.current;
@@ -210,6 +207,7 @@ const handleStart = (scope: any) => {
     .then((data) => {
       // 处理成功响应
       const res = data.data;
+      console.log(res)
       if (res.code == 500) {
         ElMessage(res.message);
       } else {
