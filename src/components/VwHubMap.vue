@@ -10,7 +10,7 @@ import "echarts-extension-amap";
 import { ref, shallowRef, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
-import {inject} from 'vue'
+import { inject } from "vue";
 
 const baseUrl = inject("baseUrl");
 const AMap = window.AMap;
@@ -18,6 +18,7 @@ let container = ref();
 let map = shallowRef("null");
 let myChart = shallowRef("null");
 const flyLineData = ref([]);
+const lineData = ref([]);
 const pointData = ref([]);
 
 const queryParams = ref("");
@@ -39,8 +40,26 @@ onMounted(() => {
       .get(baseUrl + "vwHubInput/view", { params })
       .then((data) => {
         const resData = data.data.data;
-        console.log(resData);
-        flyLineData.value = resData.lineRes;
+        const values = Object.values(resData.lineRes);
+        console.log(values);
+        values.forEach((item) => {
+          console.log(item.data);
+          const lineItem = {
+            type: "lines",
+            coordinateSystem: "amap",
+            zlevel: 2,
+            lineStyle: {
+              normal: {
+                width: 2, //尾迹线条宽度
+                opacity: 1, //尾迹线条透明度
+              },
+            },
+            data: item.data,
+          };
+          lineData.value.push(lineItem);
+        });
+        // flyLineData.value = resData.lineRes;
+        console.log("line", lineData.value);
         pointData.value = resData.pointRes;
 
         //数据请求完 再加载地图
@@ -57,6 +76,7 @@ onMounted(() => {
         newCharts();
       })
       .catch((error) => {
+        console.log(error);
         ElMessage(error);
       });
   }
@@ -73,8 +93,8 @@ onMounted(() => {
 });
 const newCharts = () => {
   myChart.value = echarts.init(container.value);
-  console.log(pointData.value);
-  console.log(flyLineData.value);
+  // console.log(pointData.value);
+  // console.log(flyLineData.value);
   const option = {
     // 高德地图的配置
     amap: {
@@ -88,28 +108,6 @@ const newCharts = () => {
     },
     animation: true,
     series: [
-      {
-        type: "lines",
-        coordinateSystem: "amap",
-        zlevel: 2,
-        effect: {
-          show: false,
-          period: 4, //箭头指向速度，值越小速度越快
-          trailLength: 0.02, //特效尾迹长度[0,1]值越大，尾迹越长重
-          symbol: "arrow", //箭头图标
-          symbolSize: 5, //图标大小
-          color: "#fff",
-        },
-        lineStyle: {
-          normal: {
-            width: 1, //尾迹线条宽度
-            opacity: 1, //尾迹线条透明度
-            // curveness: 0.3, //尾迹线条曲直度
-            color: "blue",
-          },
-        },
-        data: flyLineData.value,
-      },
       {
         type: "effectScatter",
         coordinateSystem: "amap",
@@ -130,7 +128,7 @@ const newCharts = () => {
         },
         data: pointData.value,
       },
-    ],
+    ].concat(lineData.value),
   };
   myChart.value.setOption(option);
   // 需要注意的是amap，这里的配置就是针对 高德地图的配置了，而支持哪些配置可以在高德地图api查看
