@@ -93,7 +93,7 @@ const newCharts = () => {
         coordinateSystem: "amap",
         zlevel: 2,
         effect: {
-          show: true,
+          show: false,
           period: 4, //箭头指向速度，值越小速度越快
           trailLength: 0.02, //特效尾迹长度[0,1]值越大，尾迹越长重
           symbol: "arrow", //箭头图标
@@ -104,8 +104,8 @@ const newCharts = () => {
           normal: {
             width: 1, //尾迹线条宽度
             opacity: 1, //尾迹线条透明度
-            curveness: 0.3, //尾迹线条曲直度
-            color: "red",
+            // curveness: 0.3, //尾迹线条曲直度
+            color: "blue",
           },
         },
         data: flyLineData.value,
@@ -125,7 +125,7 @@ const newCharts = () => {
         itemStyle: {
           normal: {
             show: false,
-            color: "yellow",
+            color: "black",
           },
         },
         data: pointData.value,
