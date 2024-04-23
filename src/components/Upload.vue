@@ -273,7 +273,7 @@ button {
 
 .header{
   background: black;
-  width: auto;
+  width: 100%;
   height: 100px;
   font: 20px;
   color: bisque;
