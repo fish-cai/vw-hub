@@ -14,25 +14,27 @@
         <label>上传文件</label>
       </el-form-item>
       <el-form-item>
-        <el-input
-          placeholder="文件名"
-          v-model="formData.modelFileName"
-          disabled
-          style="width: 200px"
-        />
-        <el-upload
-          class="upload-demo"
-          style="width: 50%"
-          action="none"
-          :show-file-list="false"
-          drag
-          :on-change="handleFileChange"
-          :auto-upload="false"
-          ref="fileInputRef"
-        >
-          <el-icon class="l-eicon--upload"><upload-filled /></el-icon>
-          <div class="el-upload__text">点击上传文件</div>
-        </el-upload>
+        <div style="display: flex; flex-direction: column">
+          <el-input
+            placeholder="文件名"
+            v-model="formData.modelFileName"
+            disabled
+            style="width: 100%"
+          />
+          <el-upload
+            class="upload-demo"
+            style="width: 100%"
+            action="none"
+            :show-file-list="false"
+            :on-change="handleFileChange"
+            :auto-upload="false"
+            ref="fileInputRef"
+          >
+            <el-button type="primary">点击上传文件</el-button>
+          </el-upload>
+        </div>
+      </el-form-item>
+      <el-form-item>
         <el-button type="primary" @click="submitForm">提交</el-button>
       </el-form-item>
     </el-form>
@@ -210,7 +212,7 @@ const handleStart = (scope: any) => {
     .then((data) => {
       // 处理成功响应
       const res = data.data;
-      console.log(res)
+      console.log(res);
       if (res.code == 500) {
         ElMessage(res.message);
       } else {
@@ -271,21 +273,20 @@ button {
   text-align: center;
 }
 
-.header{
+.header {
   background: black;
   width: 100%;
   height: 100px;
-  font: 20px;
   color: bisque;
   text-align: center;
   position: relative;
 }
 
 .header-text {
+  font-size: 24px;
   position: absolute; /* 设置绝对定位 */
-  bottom: 10px; /* 距离底部 0px */
-  left: 10px; /* 距离左边 0px */
+  bottom: 20px; /* 距离底部 0px */
+  left: 100px; /* 距离左边 0px */
   margin: 0; /* 移除默认的外边距 */
 }
-
 </style>
