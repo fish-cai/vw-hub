@@ -1,4 +1,7 @@
 <template>
+  <div class="header">
+    <p class="header-text">smart reginal hubs network planning</p>
+  </div>
   <div>
     <el-form :inline="true" v-model="formData" label-width="auto" label-position="left">
       <el-form-item label="文件类型">
@@ -27,7 +30,7 @@
           :auto-upload="false"
           ref="fileInputRef"
         >
-          <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+          <el-icon class="l-eicon--upload"><upload-filled /></el-icon>
           <div class="el-upload__text">点击上传文件</div>
         </el-upload>
         <el-button type="primary" @click="submitForm">提交</el-button>
@@ -267,4 +270,22 @@ button {
 .el-form-item {
   text-align: center;
 }
+
+.header{
+  background: black;
+  width: auto;
+  height: 100px;
+  font: 20px;
+  color: bisque;
+  text-align: center;
+  position: relative;
+}
+
+.header-text {
+  position: absolute; /* 设置绝对定位 */
+  bottom: 10px; /* 距离底部 0px */
+  left: 10px; /* 距离左边 0px */
+  margin: 0; /* 移除默认的外边距 */
+}
+
 </style>
