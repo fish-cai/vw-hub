@@ -30,21 +30,21 @@
             :auto-upload="false"
             ref="fileInputRef"
           >
-            <el-button bg text type="">点击上传文件</el-button>
+            <el-button bg color="rgb(212,214,217)" text type="">点击上传文件</el-button>
           </el-upload>
         </div>
       </el-form-item>
       <el-form-item>
-        <el-button color="#d49a09" type="primary" @click="submitForm">提交</el-button>
+        <el-button color=rgb(216,170,0) type="primary" @click="submitForm">提交</el-button>
       </el-form-item>
     </el-form>
     <div class="table" style="margin-top: 20px">
       <h3>列表</h3>
       <el-table :data="tableData" style="width: 100%">
-        <el-table-column prop="fileName" label="文件名" />
-        <el-table-column prop="typeName" label="文件类型" />
-        <el-table-column prop="createTime" label="上传时间" />
-        <el-table-column label="操作">
+        <el-table-column prop="fileName" label="文件名"/>
+        <el-table-column prop="typeName" label="文件类型" align="center"/>
+        <el-table-column prop="createTime" label="上传时间" align="center"/>
+        <el-table-column label="操作" align="center">
           <template #default="scope">
             <el-button
               :loading="scope.row.startLoading"
@@ -90,7 +90,7 @@
         :total="changePage.total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        style="--el-color-primary: #d49a09"
+        style="--el-color-primary: rgb(216,170,0)"
       />
     </div>
   </div>
@@ -278,16 +278,19 @@ button {
   background: black;
   width: 100%;
   height: 100px;
-  color: bisque;
+  color: rgb(216, 170, 0);
   text-align: center;
   position: relative;
 }
 
 .header-text {
-  font-size: 24px;
+  font-size: 40px;
   position: absolute; /* 设置绝对定位 */
   bottom: 20px; /* 距离底部 0px */
-  left: 100px; /* 距离左边 0px */
   margin: 0; /* 移除默认的外边距 */
+}
+
+.el-table .cell{
+  padding: 0;
 }
 </style>
