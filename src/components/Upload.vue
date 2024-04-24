@@ -30,12 +30,12 @@
             :auto-upload="false"
             ref="fileInputRef"
           >
-            <el-button type="primary">点击上传文件</el-button>
+            <el-button bg text type="">点击上传文件</el-button>
           </el-upload>
         </div>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submitForm">提交</el-button>
+        <el-button color="#d49a09" type="primary" @click="submitForm">提交</el-button>
       </el-form-item>
     </el-form>
     <div class="table" style="margin-top: 20px">
@@ -90,6 +90,7 @@
         :total="changePage.total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
+        style="--el-color-primary: #d49a09"
       />
     </div>
   </div>
